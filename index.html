@@ -1,0 +1,2153 @@
+<!--
+  orhan.prints — Snapmaker U1 Stepper Synth
+  Copyright (c) 2026 orhan.prints
+
+  MIT License
+
+  Permission is hereby granted, free of charge, to any person obtaining a copy
+  of this software and associated documentation files (the "Software"), to deal
+  in the Software without restriction, including without limitation the rights
+  to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+  copies of the Software, and to permit persons to whom the Software is
+  furnished to do so, subject to the following conditions:
+
+  The above copyright notice and this permission notice shall be included in all
+  copies or substantial portions of the Software.
+
+  THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+  IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+  FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+  AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+  LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+  OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
+  SOFTWARE.
+-->
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth dark">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>orhan.prints — Snapmaker U1 Stepper Synth</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          fontFamily: {
+            sans: ['-apple-system', 'BlinkMacSystemFont', '"SF Pro Display"', '"SF Pro Text"', '"Segoe UI"', 'Roboto', 'Helvetica', 'Arial', 'sans-serif'],
+            mono: ['"SF Mono"', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas', '"Liberation Mono"', 'monospace'],
+          },
+          colors: {
+            apple: {
+              bg: '#F5F5F7',
+              card: '#FFFFFF',
+              elevated: '#E8E8ED',
+              border: 'rgba(0, 0, 0, 0.1)',
+              ink: '#1D1D1F',
+              sub: '#86868B',
+              blue: '#0071E3',
+              blueHover: '#0077ED'
+            },
+            darkapple: {
+              bg: '#000000',
+              card: '#1C1C1E',
+              elevated: '#2C2C2E',
+              border: 'rgba(255, 255, 255, 0.12)',
+              ink: '#F5F5F7',
+              sub: '#98989D',
+              blue: '#0A84FF',
+              blueHover: '#409CFF'
+            }
+          },
+          boxShadow: {
+            'apple': '0 4px 20px rgba(0, 0, 0, 0.06), 0 1px 3px rgba(0, 0, 0, 0.04)',
+            'apple-dark': '0 8px 32px rgba(0, 0, 0, 0.5), inset 0 1px 0 rgba(255, 255, 255, 0.08)',
+          }
+        }
+      }
+    };
+  </script>
+  <script>
+    (function () {
+      const saved = localStorage.getItem('orhan_prints_theme');
+      if (saved === 'light') {
+        document.documentElement.classList.remove('dark');
+      } else {
+        document.documentElement.classList.add('dark');
+      }
+    })();
+  </script>
+  <style>
+    .tabular-nums { font-variant-numeric: tabular-nums; }
+    input[type="range"] {
+      -webkit-appearance: none;
+      appearance: none;
+      height: 5px;
+      border-radius: 999px;
+      outline: none;
+      background: rgba(128, 128, 128, 0.25);
+    }
+    input[type="range"]::-webkit-slider-thumb {
+      -webkit-appearance: none;
+      appearance: none;
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #0071E3;
+      cursor: pointer;
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+      transition: transform 0.12s ease;
+    }
+    .dark input[type="range"]::-webkit-slider-thumb {
+      background: #0A84FF;
+      border-color: #1C1C1E;
+    }
+    input[type="range"]::-webkit-slider-thumb:hover { transform: scale(1.12); }
+
+    input[type="range"]::-moz-range-thumb {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: #0071E3;
+      cursor: pointer;
+      border: 3px solid #FFFFFF;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.25);
+    }
+    .dark input[type="range"]::-moz-range-thumb {
+      background: #0A84FF;
+      border-color: #1C1C1E;
+    }
+
+    .range-slider { position: relative; width: 100%; height: 28px; }
+    .range-slider input[type="range"] {
+      position: absolute; left: 0; top: 11px; width: 100%; background: none; pointer-events: none; margin: 0;
+    }
+    .range-slider input[type="range"]::-webkit-slider-thumb {
+      pointer-events: auto; position: relative; z-index: 10;
+    }
+    .range-slider input[type="range"]::-moz-range-thumb {
+      pointer-events: auto; position: relative; z-index: 10;
+    }
+
+    select.custom-select {
+      -webkit-appearance: none;
+      appearance: none;
+      background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='14' height='14' viewBox='0 0 24 24' fill='none' stroke='%2386868B' stroke-width='2.2' stroke-linecap='round' stroke-linejoin='round'%3E%3Cpolyline points='6 9 12 15 18 9'%3E%3C/polyline%3E%3C/svg%3E");
+      background-repeat: no-repeat;
+      background-position: right 0.85rem center;
+      background-size: 14px;
+      padding-right: 2.5rem;
+    }
+  </style>
+</head>
+<body class="bg-apple-bg text-apple-ink dark:bg-darkapple-bg dark:text-darkapple-ink font-sans antialiased transition-colors duration-200 selection:bg-apple-blue selection:text-white dark:selection:bg-darkapple-blue">
+
+  <!-- Header -->
+  <header class="sticky top-0 z-40 backdrop-blur-xl bg-apple-bg/80 dark:bg-darkapple-bg/80 border-b border-apple-border dark:border-darkapple-border">
+    <div class="max-w-5xl mx-auto px-4 sm:px-6 h-14 flex items-center justify-between gap-4">
+      <div class="flex items-center gap-2.5">
+        <span class="w-2.5 h-2.5 rounded-full bg-apple-blue dark:bg-darkapple-blue"></span>
+        <span class="font-semibold tracking-tight text-[17px]">orhan.prints</span>
+      </div>
+
+      <button id="themeToggle" type="button" aria-label="Toggle Theme" class="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full border border-apple-border dark:border-darkapple-border bg-apple-card dark:bg-darkapple-elevated text-xs font-medium hover:border-apple-blue dark:hover:border-darkapple-blue transition">
+        <span class="inline-flex dark:hidden items-center gap-1.5">Dark Mode</span>
+        <span class="hidden dark:inline-flex items-center gap-1.5">Light Mode</span>
+      </button>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto px-4 sm:px-6 py-7 sm:py-9 space-y-6">
+
+    <!-- MODULE 01: SOURCE SELECTION -->
+    <section class="rounded-2xl bg-apple-card dark:bg-darkapple-card border border-apple-border dark:border-darkapple-border shadow-apple dark:shadow-apple-dark p-5 sm:p-7 space-y-5">
+      <div class="flex items-center gap-2.5">
+        <span class="font-mono text-[11px] font-semibold text-apple-blue dark:text-darkapple-blue">01</span>
+        <h2 class="font-semibold text-lg sm:text-[19px]">Source Selection</h2>
+      </div>
+
+      <label id="dropZone" for="fileInput" class="group flex flex-col sm:flex-row items-center justify-between gap-4 rounded-xl border border-dashed border-black/20 dark:border-white/20 hover:border-apple-blue dark:hover:border-darkapple-blue bg-apple-bg/50 dark:bg-darkapple-elevated/40 px-4 py-4 cursor-pointer transition">
+        <input id="fileInput" type="file" accept=".mid,.midi,.mp3,.wav,audio/midi,audio/x-midi,audio/mpeg,audio/wav" class="sr-only" />
+        <div class="flex items-center gap-3.5 min-w-0 w-full sm:w-auto">
+          <div class="w-10 h-10 rounded-xl bg-apple-blue/10 dark:bg-darkapple-blue/15 text-apple-blue dark:text-darkapple-blue flex items-center justify-center shrink-0 group-hover:bg-apple-blue group-hover:text-white transition-colors">
+            <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.1">
+              <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v2a2 2 0 002 2h12a2 2 0 002-2v-2M12 4v12m0-12L8 8m4-4l4 4" />
+            </svg>
+          </div>
+          <div class="min-w-0">
+            <div class="text-sm font-semibold truncate">
+              Upload <span class="font-mono text-apple-blue dark:text-darkapple-blue">.MID</span>, <span class="font-mono text-apple-blue dark:text-darkapple-blue">.MIDI</span>, <span class="font-mono text-apple-blue dark:text-darkapple-blue">.MP3</span>, or <span class="font-mono text-apple-blue dark:text-darkapple-blue">.WAV</span>
+            </div>
+            <div id="fileStatusText" class="text-xs text-apple-sub dark:text-darkapple-sub truncate mt-0.5">
+              Drop file here or choose a preset below
+            </div>
+          </div>
+        </div>
+        <span class="hidden sm:inline-flex px-3.5 py-1.5 rounded-full bg-apple-card dark:bg-darkapple-elevated border border-apple-border dark:border-darkapple-border text-xs font-medium shrink-0 group-hover:border-apple-blue dark:group-hover:border-darkapple-blue transition">
+          Choose File
+        </span>
+      </label>
+
+      <!-- Optional Low-Volume Audio Sensitivity Toggle (L+R Stereo Mix) -->
+      <div class="flex items-center justify-between gap-4 px-4 py-3 rounded-xl bg-apple-bg/60 dark:bg-darkapple-elevated/40 border border-apple-border dark:border-darkapple-border">
+        <div class="min-w-0">
+          <div class="text-xs sm:text-sm font-semibold">
+            Low-Volume Audio Sensitivity
+            <span class="font-mono text-[11px] font-normal text-apple-sub dark:text-darkapple-sub">(MP3 / WAV)</span>
+          </div>
+          <div class="text-[11px] text-apple-sub dark:text-darkapple-sub mt-0.5">
+            Stereo L+R summed · Captures quiet intros, soft fades, and faster staccato notes
+          </div>
+        </div>
+        <button id="lowVolToggle" type="button" role="switch" aria-checked="false" aria-label="Toggle Low-Volume Audio Sensitivity" class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-black/20 dark:bg-white/20 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-apple-blue">
+          <span id="lowVolThumb" class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-0"></span>
+        </button>
+      </div>
+
+      <!-- Preset Cards with Dynamic Custom Card -->
+      <div id="presetGrid" class="grid grid-cols-2 sm:grid-cols-5 gap-2.5">
+        <button type="button" data-preset="runaway" class="preset-btn text-left p-3.5 rounded-xl border border-apple-blue dark:border-darkapple-blue bg-apple-blue dark:bg-darkapple-blue text-white shadow-sm transition-all">
+          <div class="font-semibold text-sm truncate">Running Away Chime</div>
+        </button>
+        <button type="button" data-preset="turkish_march" class="preset-btn text-left p-3.5 rounded-xl border border-apple-border dark:border-darkapple-border bg-apple-elevated/70 dark:bg-darkapple-elevated/60 hover:border-apple-blue transition-all">
+          <div class="font-semibold text-sm truncate">Turkish Classical March</div>
+        </button>
+        <button type="button" data-preset="imperial_march" class="preset-btn text-left p-3.5 rounded-xl border border-apple-border dark:border-darkapple-border bg-apple-elevated/70 dark:bg-darkapple-elevated/60 hover:border-apple-blue transition-all">
+          <div class="font-semibold text-sm truncate">Sci-Fi March</div>
+        </button>
+        <button type="button" data-preset="rickroll" class="preset-btn text-left p-3.5 rounded-xl border border-apple-border dark:border-darkapple-border bg-apple-elevated/70 dark:bg-darkapple-elevated/60 hover:border-apple-blue transition-all">
+          <div class="font-semibold text-sm truncate">Old Pop</div>
+        </button>
+        <button type="button" id="customPresetBtn" data-preset="custom" class="preset-btn text-left p-3.5 rounded-xl border border-dashed border-apple-border dark:border-darkapple-border bg-apple-elevated/40 dark:bg-darkapple-elevated/30 opacity-75 hover:opacity-100 hover:border-apple-blue transition-all">
+          <div id="customPresetLabel" class="font-semibold text-sm truncate">Custom</div>
+        </button>
+      </div>
+    </section>
+
+    <!-- MODULE 02: ACOUSTIC & KINEMATIC TUNING -->
+    <section class="rounded-2xl bg-apple-card dark:bg-darkapple-card border border-apple-border dark:border-darkapple-border shadow-apple dark:shadow-apple-dark p-5 sm:p-7 space-y-6">
+      <div class="flex items-center gap-2.5">
+        <span class="font-mono text-[11px] font-semibold text-apple-blue dark:text-darkapple-blue">02</span>
+        <h2 class="font-semibold text-lg sm:text-[19px]">Acoustic &amp; Kinematic Tuning</h2>
+      </div>
+
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+        <div class="space-y-2.5">
+          <label class="text-sm font-semibold block">Voice Mode</label>
+          <div class="grid grid-cols-3 gap-1 p-1 rounded-xl bg-apple-elevated dark:bg-darkapple-bg border border-apple-border dark:border-darkapple-border">
+            <button type="button" data-voicemode="3track" class="voice-mode-btn py-1.5 px-2 rounded-lg bg-apple-card dark:bg-darkapple-elevated shadow-sm text-xs font-semibold transition-all">3-Axis</button>
+            <button type="button" data-voicemode="2track" class="voice-mode-btn py-1.5 px-2 rounded-lg text-apple-sub dark:text-darkapple-sub text-xs font-medium transition-all">2-Axis</button>
+            <button type="button" data-voicemode="loudY" class="voice-mode-btn py-1.5 px-2 rounded-lg text-apple-sub dark:text-darkapple-sub text-xs font-medium transition-all">1-Axis</button>
+          </div>
+          <p class="text-xs text-apple-sub dark:text-darkapple-sub leading-relaxed">Splits lead and harmony diagonally across CoreXY Motors A &amp; B while vibrating the Z steel bed for bass resonance.</p>
+        </div>
+
+        <div class="space-y-2.5">
+          <div class="flex items-center justify-between">
+            <label for="staccatoRange" class="text-sm font-semibold">Staccato Articulation</label>
+            <span id="staccatoValue" class="font-mono text-xs font-semibold text-apple-blue dark:text-darkapple-blue tabular-nums">15 ms</span>
+          </div>
+          <div class="pt-1">
+            <input id="staccatoRange" type="range" min="0" max="4" step="1" value="1" class="w-full bg-apple-elevated dark:bg-darkapple-elevated block" />
+          </div>
+          <div class="relative h-5 mt-1 text-[10px] font-mono text-apple-sub dark:text-darkapple-sub tabular-nums select-none">
+            <span style="left: calc(10px + (100% - 20px) * 0.00);" class="absolute top-0 -translate-x-1/2">0ms</span>
+            <span style="left: calc(10px + (100% - 20px) * 0.25);" class="absolute top-0 -translate-x-1/2">15ms</span>
+            <span style="left: calc(10px + (100% - 20px) * 0.50);" class="absolute top-0 -translate-x-1/2">30ms</span>
+            <span style="left: calc(10px + (100% - 20px) * 0.75);" class="absolute top-0 -translate-x-1/2">45ms</span>
+            <span style="left: calc(10px + (100% - 20px) * 1.00);" class="absolute top-0 -translate-x-1/2">60ms</span>
+          </div>
+          <p class="text-xs text-apple-sub dark:text-darkapple-sub leading-relaxed">Controls <code class="font-mono">G4</code> dwell pauses between notes to brake stepper rotor inertia for crisp plucked separation.</p>
+        </div>
+
+        <div class="space-y-2.5">
+          <label for="accelSelect" class="text-sm font-semibold block">Transient Acceleration</label>
+          <select id="accelSelect" class="custom-select w-full rounded-xl bg-apple-elevated/80 dark:bg-darkapple-elevated/80 border border-apple-border dark:border-darkapple-border px-3.5 py-2.5 font-mono text-xs font-medium focus:outline-none focus:ring-2 focus:ring-apple-blue transition">
+            <option value="10000">M204 S10000 — Smooth</option>
+            <option value="15000" selected>M204 S15000 — Standard</option>
+            <option value="20000">M204 S20000 — Percussive</option>
+          </select>
+          <p class="text-xs text-apple-sub dark:text-darkapple-sub leading-relaxed">Sets temporary stepper cornering punch so motors lock instantaneously onto target pitches before restoring <code class="font-mono">M204 S6000</code>.</p>
+        </div>
+
+        <div class="space-y-2.5">
+          <label for="octaveSelect" class="text-sm font-semibold block">Octave Shift</label>
+          <select id="octaveSelect" class="custom-select w-full rounded-xl bg-apple-elevated/80 dark:bg-darkapple-elevated/80 border border-apple-border dark:border-darkapple-border px-3.5 py-2.5 font-mono text-xs font-medium focus:outline-none focus:ring-2 focus:ring-apple-blue transition">
+            <option value="-1">-1 Oct (Warm Low)</option>
+            <option value="0" selected>0 Oct (Native)</option>
+            <option value="+1">+1 Oct (Bright High)</option>
+          </select>
+          <p class="text-xs text-apple-sub dark:text-darkapple-sub leading-relaxed">Transposes pitches to keep motor frequencies inside the loudest acoustic resonance band of the U1 frame.</p>
+        </div>
+      </div>
+
+      <!-- Continuous Frequency Glide (Boundary-Bounce) Toggle -->
+      <div class="flex items-center justify-between gap-4 px-4 py-3 rounded-xl bg-apple-bg/60 dark:bg-darkapple-elevated/40 border border-apple-border dark:border-darkapple-border">
+        <div class="min-w-0">
+          <div class="text-xs sm:text-sm font-semibold">
+            Continuous Frequency Glide
+            <span class="font-mono text-[11px] font-normal text-apple-sub dark:text-darkapple-sub">(Boundary-Bounce)</span>
+          </div>
+          <div class="text-[11px] text-apple-sub dark:text-darkapple-sub mt-0.5">
+            Chains rising &amp; falling pitches in one smooth direction without reversing clicks, bouncing only at safe box walls
+          </div>
+        </div>
+        <button id="continuousGlideToggle" type="button" role="switch" aria-checked="false" aria-label="Toggle Continuous Frequency Glide" class="relative inline-flex h-6 w-11 shrink-0 cursor-pointer rounded-full border-2 border-transparent bg-black/20 dark:bg-white/20 transition-colors duration-200 ease-in-out focus:outline-none focus:ring-2 focus:ring-apple-blue">
+          <span id="continuousGlideThumb" class="pointer-events-none inline-block h-5 w-5 transform rounded-full bg-white shadow ring-0 transition duration-200 ease-in-out translate-x-0"></span>
+        </button>
+      </div>
+    </section>
+
+    <!-- MODULE 03: EDITOR-STYLE TRIM TIMELINE -->
+    <section class="rounded-2xl bg-apple-card dark:bg-darkapple-card border border-apple-border dark:border-darkapple-border shadow-apple dark:shadow-apple-dark p-5 sm:p-7 space-y-5">
+      <div class="flex items-center gap-2.5">
+        <span class="font-mono text-[11px] font-semibold text-apple-blue dark:text-darkapple-blue">03</span>
+        <h2 class="font-semibold text-lg sm:text-[19px]">Playback Range &amp; Trim</h2>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <div class="lg:col-span-5 space-y-4">
+          <div class="grid grid-cols-2 gap-3">
+            <div class="space-y-1.5">
+              <label for="startSecInput" class="block font-mono text-[11px] font-semibold text-apple-sub dark:text-darkapple-sub uppercase tracking-wider">Start (s)</label>
+              <input id="startSecInput" type="number" step="0.1" min="0" class="w-full rounded-xl bg-apple-elevated/70 dark:bg-darkapple-elevated border border-apple-border dark:border-darkapple-border px-3 py-2 font-mono text-xs tabular-nums focus:outline-none focus:ring-2 focus:ring-apple-blue" value="0.0" />
+            </div>
+            <div class="space-y-1.5">
+              <label for="endSecInput" class="block font-mono text-[11px] font-semibold text-apple-sub dark:text-darkapple-sub uppercase tracking-wider">End (s)</label>
+              <input id="endSecInput" type="number" step="0.1" min="0.1" class="w-full rounded-xl bg-apple-elevated/70 dark:bg-darkapple-elevated border border-apple-border dark:border-darkapple-border px-3 py-2 font-mono text-xs tabular-nums focus:outline-none focus:ring-2 focus:ring-apple-blue" value="0.0" />
+            </div>
+          </div>
+
+          <button id="fullTrackBtn" type="button" class="w-full py-2.5 rounded-xl bg-apple-elevated dark:bg-darkapple-elevated border border-apple-border dark:border-darkapple-border font-mono text-xs font-semibold hover:border-apple-blue transition flex items-center justify-center gap-2">
+            <span>Full Track</span>
+            <span id="fullTrackBadge" class="text-apple-blue dark:text-darkapple-blue tabular-nums">(0.0s)</span>
+          </button>
+
+          <p class="text-xs text-apple-sub dark:text-darkapple-sub leading-relaxed">
+            Drag the left or right trim brackets directly on the audio waveform (or use the sliders below) to isolate a chorus or hook.
+          </p>
+        </div>
+
+        <!-- Visual audio waveform container with interactive bracket handles + dual sliders -->
+        <div class="lg:col-span-7">
+          <div class="p-4 rounded-2xl bg-apple-bg dark:bg-darkapple-bg border border-apple-border dark:border-darkapple-border space-y-2.5">
+            <div class="flex items-center justify-between font-mono text-xs text-apple-sub dark:text-darkapple-sub tabular-nums">
+              <span id="trimRangeDisplay">0.0s — 0.0s</span>
+              <span class="text-apple-blue dark:text-darkapple-blue font-semibold">Active Clip Window</span>
+            </div>
+
+            <div class="relative w-full h-24 rounded-xl overflow-hidden bg-black/5 dark:bg-white/5 border border-black/10 dark:border-white/10 select-none">
+              <canvas id="waveformCanvas" class="w-full h-full block cursor-ew-resize touch-none"></canvas>
+            </div>
+
+            <div class="range-slider">
+              <input id="trimStartRange" type="range" min="0" max="100" value="0" step="0.1" aria-label="Trim Start Slider" />
+              <input id="trimEndRange" type="range" min="0" max="100" value="100" step="0.1" aria-label="Trim End Slider" />
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 04: REALISTIC 2D BED SIMULATOR (LIGHT/DARK ADAPTIVE) -->
+    <section class="rounded-2xl bg-apple-card dark:bg-darkapple-card border border-apple-border dark:border-darkapple-border shadow-apple dark:shadow-apple-dark p-5 sm:p-7 space-y-5">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="flex items-center gap-2.5">
+          <span class="font-mono text-[11px] font-semibold text-apple-blue dark:text-darkapple-blue">04</span>
+          <h2 class="font-semibold text-lg sm:text-[19px]">2D Snapmaker U1 Kinematic Preview</h2>
+        </div>
+
+        <button id="previewBtn" type="button" class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-apple-blue dark:bg-darkapple-blue hover:bg-apple-blueHover text-white text-xs font-semibold shadow-sm transition">
+          <svg id="playIcon" class="w-3.5 h-3.5" fill="currentColor" viewBox="0 0 24 24"><path d="M8 5v14l11-7z" /></svg>
+          <svg id="stopIcon" class="w-3.5 h-3.5 hidden" fill="currentColor" viewBox="0 0 24 24"><path d="M6 6h12v12H6z" /></svg>
+          <span id="previewBtnText">Play</span>
+        </button>
+      </div>
+
+      <div class="grid grid-cols-1 lg:grid-cols-12 gap-6 items-center">
+        <div class="lg:col-span-7">
+          <div class="relative w-full aspect-square max-w-[380px] mx-auto rounded-2xl overflow-hidden border border-black/15 dark:border-white/15 shadow-inner bg-apple-bg dark:bg-[#141518]">
+            <canvas id="bedCanvas" class="w-full h-full block"></canvas>
+          </div>
+        </div>
+
+        <div class="lg:col-span-5 space-y-3">
+          <div class="grid grid-cols-2 gap-2.5 font-mono">
+            <div class="p-3.5 rounded-xl bg-apple-bg dark:bg-darkapple-bg border border-apple-border dark:border-darkapple-border">
+              <div class="text-[10px] uppercase tracking-wider text-apple-sub dark:text-darkapple-sub">Coordinates</div>
+              <div id="telPos" class="text-xs sm:text-sm font-semibold mt-1 tabular-nums">X135.0 Y135.0 Z15.0</div>
+            </div>
+            <div class="p-3.5 rounded-xl bg-apple-bg dark:bg-darkapple-bg border border-apple-border dark:border-darkapple-border">
+              <div class="text-[10px] uppercase tracking-wider text-apple-sub dark:text-darkapple-sub">Net Drift</div>
+              <div class="text-xs sm:text-sm font-semibold text-emerald-500 mt-1 tabular-nums">0.000 mm</div>
+            </div>
+            <div class="p-3.5 rounded-xl bg-apple-bg dark:bg-darkapple-bg border border-apple-border dark:border-darkapple-border">
+              <div class="text-[10px] uppercase tracking-wider text-apple-sub dark:text-darkapple-sub">Motor A / Motor B</div>
+              <div id="telMotorsAB" class="text-xs sm:text-sm font-semibold text-apple-blue dark:text-darkapple-blue mt-1 tabular-nums">0 Hz · 0 Hz</div>
+            </div>
+            <div class="p-3.5 rounded-xl bg-apple-bg dark:bg-darkapple-bg border border-apple-border dark:border-darkapple-border">
+              <div class="text-[10px] uppercase tracking-wider text-apple-sub dark:text-darkapple-sub">Z-Bed Bass</div>
+              <div id="telMotorZ" class="text-xs sm:text-sm font-semibold mt-1 tabular-nums">0 Hz</div>
+            </div>
+          </div>
+
+          <div class="p-3.5 rounded-xl bg-apple-bg dark:bg-darkapple-bg border border-apple-border dark:border-darkapple-border space-y-2.5">
+            <div class="flex items-center justify-between text-xs font-mono text-apple-sub dark:text-darkapple-sub tabular-nums">
+              <span id="scrubCurrent">0.0s</span>
+              <span id="scrubTotal">0.0s</span>
+            </div>
+            <input id="timelineScrubber" type="range" min="0" max="1000" value="0" class="w-full block" />
+          </div>
+
+          <div class="text-[11px] font-mono text-apple-sub dark:text-darkapple-sub flex flex-wrap gap-x-4 gap-y-1 px-0.5">
+            <span><span class="inline-block w-2 h-2 rounded-full bg-apple-blue dark:bg-darkapple-blue mr-1.5"></span>Motor A (X+Y)</span>
+            <span><span class="inline-block w-2 h-2 rounded-full bg-amber-500 mr-1.5"></span>Motor B (Y-X)</span>
+            <span><span class="inline-block w-2 h-2 rounded-full bg-emerald-500 mr-1.5"></span>Safe Box / Z-Bed</span>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- MODULE 05: G-CODE OUTPUT & KLIPPER INTEGRATION -->
+    <section class="rounded-2xl bg-apple-card dark:bg-darkapple-card border border-apple-border dark:border-darkapple-border shadow-apple dark:shadow-apple-dark p-5 sm:p-7 space-y-4">
+      <div class="flex flex-wrap items-center justify-between gap-3">
+        <div class="inline-flex p-1 rounded-xl bg-apple-elevated dark:bg-darkapple-bg border border-apple-border dark:border-darkapple-border">
+          <button id="tabConsoleBtn" type="button" class="px-3.5 py-1.5 rounded-lg bg-apple-card dark:bg-darkapple-elevated shadow-sm font-mono text-xs font-semibold transition-all">Fluidd Console</button>
+          <button id="tabMacroBtn" type="button" class="px-3.5 py-1.5 rounded-lg text-apple-sub dark:text-darkapple-sub font-mono text-xs font-medium transition-all">printer.cfg</button>
+        </div>
+
+        <div class="flex items-center gap-2">
+          <button id="downloadGcodeBtn" type="button" class="inline-flex items-center gap-1.5 px-3.5 py-2 rounded-full bg-apple-elevated dark:bg-darkapple-elevated border border-apple-border dark:border-darkapple-border hover:border-apple-blue text-xs font-semibold transition">
+            <svg class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4" /></svg>
+            Download .gcode
+          </button>
+          <button id="copyGcodeBtn" type="button" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-apple-blue dark:bg-darkapple-blue hover:bg-apple-blueHover text-white text-xs font-semibold shadow-sm transition">
+            <svg id="copyIcon" class="w-3.5 h-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" /></svg>
+            <svg id="checkIcon" class="w-3.5 h-3.5 hidden" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2.4"><path stroke-linecap="round" stroke-linejoin="round" d="M5 13l4 4L19 7" /></svg>
+            <span id="copyBtnLabel">Copy G-Code</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Adaptive light/dark code preview box -->
+      <div class="rounded-xl overflow-hidden border border-black/15 dark:border-white/15 bg-white dark:bg-[#141518] shadow-inner">
+        <textarea id="gcodeOutput" readonly spellcheck="false" aria-label="Generated G-Code Preview" class="w-full h-[320px] p-4 bg-[#F8F9FA] text-[#1D1D1F] dark:bg-[#141518] dark:text-[#34D399] font-mono text-xs leading-relaxed resize-y focus:outline-none selection:bg-apple-blue selection:text-white tabular-nums"></textarea>
+      </div>
+    </section>
+
+    <!-- SETUP GUIDE -->
+    <section class="rounded-2xl bg-apple-card dark:bg-darkapple-card border border-apple-border dark:border-darkapple-border shadow-apple dark:shadow-apple-dark p-5 sm:p-7 space-y-5">
+      <div class="flex items-center gap-2.5">
+        <span class="font-mono text-[11px] font-semibold text-apple-blue dark:text-darkapple-blue">05</span>
+        <h2 class="font-semibold text-lg sm:text-[19px]">Klipper &amp; OrcaSlicer Setup</h2>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3.5">
+        <div class="p-4 rounded-xl bg-apple-bg dark:bg-darkapple-bg border border-apple-border dark:border-darkapple-border space-y-1.5">
+          <div class="font-mono text-xs font-semibold text-apple-blue dark:text-darkapple-blue">01. Home All Axes</div>
+          <p class="text-xs text-apple-sub dark:text-darkapple-sub leading-relaxed">Click <strong class="text-apple-ink dark:text-darkapple-ink">Home All (G28)</strong> in Fluidd first so Klipper establishes <code class="font-mono">X0 Y0 Z0</code> before centering at <code class="font-mono">X135 Y135 Z15</code>.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-apple-bg dark:bg-darkapple-bg border border-apple-border dark:border-darkapple-border space-y-1.5">
+          <div class="font-mono text-xs font-semibold text-apple-blue dark:text-darkapple-blue">02. Test in Fluidd Console</div>
+          <p class="text-xs text-apple-sub dark:text-darkapple-sub leading-relaxed">Select <strong class="text-apple-ink dark:text-darkapple-ink">Fluidd Console</strong>, click <strong class="text-apple-ink dark:text-darkapple-ink">Copy G-Code</strong>, paste into the Fluidd Console input box, and press Enter.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-apple-bg dark:bg-darkapple-bg border border-apple-border dark:border-darkapple-border space-y-1.5">
+          <div class="font-mono text-xs font-semibold text-apple-blue dark:text-darkapple-blue">03. Save to printer.cfg</div>
+          <p class="text-xs text-apple-sub dark:text-darkapple-sub leading-relaxed">Switch to <strong class="text-apple-ink dark:text-darkapple-ink">printer.cfg</strong>, paste <code class="font-mono">[gcode_macro START_CHIME]</code> at the bottom of your config, and hit <strong class="text-apple-ink dark:text-darkapple-ink">Save &amp; Restart</strong>.</p>
+        </div>
+        <div class="p-4 rounded-xl bg-apple-bg dark:bg-darkapple-bg border border-apple-border dark:border-darkapple-border space-y-1.5">
+          <div class="font-mono text-xs font-semibold text-apple-blue dark:text-darkapple-blue">04. Trigger in OrcaSlicer</div>
+          <p class="text-xs text-apple-sub dark:text-darkapple-sub leading-relaxed">Add <code class="font-mono">START_CHIME</code> inside <strong class="text-apple-ink dark:text-darkapple-ink">Machine Start G-code</strong> right after <code class="font-mono">G28</code> to play on every print start.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- OPEN-SOURCE FOOTER -->
+    <footer class="pt-4 pb-8 border-t border-apple-border dark:border-darkapple-border flex flex-col sm:flex-row items-center justify-between gap-3 text-xs text-apple-sub dark:text-darkapple-sub">
+      <div>&copy; 2026 orhan.prints · MIT License</div>
+      <div>Always home (<code class="font-mono">G28</code>) first · Run generated G-code at your own risk</div>
+    </footer>
+
+  </main>
+
+  <script>
+    /**
+     * ============================================================================
+     * ORHAN.PRINTS — SNAPMAKER U1 STEPPER SYNTH & KINEMATICS ENGINE
+     * ============================================================================
+     */
+
+    // ----------------------------------------------------------------------------
+    // 1. AUTHENTIC MUSICAL SCORES (CALIBRATED FOR STEPPER SWEET SPOT)
+    // ----------------------------------------------------------------------------
+    function buildRunawayScore() {
+      const b = 60 / 85;
+      const e = b / 2;
+      const ev = [];
+      let t = 0;
+
+      function push(notes, dur, gap = 0.035) {
+        ev.push({
+          start: Number(t.toFixed(4)),
+          dur: Number(Math.max(0.055, dur - gap).toFixed(4)),
+          notes
+        });
+        t += dur;
+      }
+
+      // --- PART 1: ICONIC PIANO INTRO (4 BARS) ---
+      push([76], b, 0.05);
+      push([76], b, 0.05);
+      push([76], b, 0.05);
+      push([76, 64], b, 0.05);
+
+      push([76, 64, 52], b, 0.045);
+      push([76, 64], b, 0.045);
+      push([76, 64], b, 0.045);
+      push([75, 63, 51], b, 0.045);
+
+      push([75, 63, 51], b, 0.045);
+      push([75, 63], b, 0.045);
+      push([75, 63], b, 0.045);
+      push([73, 61, 49], b, 0.045);
+
+      push([73, 61, 49], b, 0.045);
+      push([73, 61], b, 0.045);
+      push([69, 57, 45], b, 0.045);
+      push([69, 57], e, 0.02);
+      push([68, 56], e, 0.02);
+
+      // --- PART 2: THE BEAT DROP (4 BARS, FULL 3-AXIS X + Y + Z) ---
+      push([76, 68, 52], e, 0.022);
+      push([76, 64, 52], e, 0.022);
+      push([76, 71, 59], e, 0.032);
+      push([76, 68, 52], e, 0.022);
+      push([76, 68, 52], e, 0.022);
+      push([76, 64, 47], e, 0.022);
+      push([76, 71, 59], e, 0.032);
+      push([75, 68, 52], e, 0.022);
+
+      push([75, 66, 51], e, 0.022);
+      push([75, 63, 51], e, 0.022);
+      push([75, 71, 58], e, 0.032);
+      push([75, 66, 47], e, 0.022);
+      push([75, 66, 47], e, 0.022);
+      push([75, 63, 47], e, 0.022);
+      push([75, 71, 58], e, 0.032);
+      push([73, 66, 51], e, 0.022);
+
+      push([73, 68, 49], e, 0.022);
+      push([73, 64, 49], e, 0.022);
+      push([73, 68, 56], e, 0.032);
+      push([73, 64, 49], e, 0.022);
+      push([73, 68, 49], e, 0.022);
+      push([73, 64, 49], e, 0.022);
+      push([73, 68, 56], e, 0.032);
+      push([69, 64, 49], e, 0.022);
+
+      push([69, 64, 45], e, 0.022);
+      push([69, 61, 45], e, 0.022);
+      push([69, 64, 52], e, 0.032);
+      push([69, 61, 45], e, 0.022);
+      push([69, 64, 45], e, 0.022);
+      push([69, 61, 45], e, 0.022);
+      push([69, 64, 52], e, 0.022);
+      push([68, 64, 47], e, 0.022);
+
+      push([76, 68, 52], b * 2, 0.04);
+
+      return ev;
+    }
+
+    function buildTurkishMarchScore() {
+      const q = 60 / 132;
+      const e = q / 2;
+      const s = q / 4;
+      const ev = [];
+      let t = 0;
+
+      function push(notes, dur, gap = 0.015) {
+        ev.push({
+          start: Number(t.toFixed(4)),
+          dur: Number(Math.max(0.04, dur - gap).toFixed(4)),
+          notes
+        });
+        t += dur;
+      }
+
+      push([71], s, 0.008);
+      push([69], s, 0.008);
+      push([68], s, 0.008);
+      push([69], s, 0.008);
+      push([72, 60, 45], q, 0.03);
+      t += e;
+
+      push([74], s, 0.008);
+      push([72], s, 0.008);
+      push([71], s, 0.008);
+      push([72], s, 0.008);
+      push([76, 64, 48], q, 0.03);
+      t += e;
+
+      push([77], s, 0.008);
+      push([76], s, 0.008);
+      push([75], s, 0.008);
+      push([76], s, 0.008);
+
+      const turn = [83, 81, 80, 81, 83, 81, 80, 81];
+      for (let i = 0; i < turn.length; i++) {
+        push(i % 4 === 0 ? [turn[i], 69, 45] : [turn[i]], s, 0.008);
+      }
+
+      push([84, 72, 45], q, 0.025);
+      push([81, 69], e, 0.014);
+      push([84, 72], e, 0.014);
+
+      push([83, 71, 52], e, 0.014);
+      push([81, 69], e, 0.014);
+      push([79, 67], e, 0.014);
+      push([81, 69], e, 0.014);
+
+      push([83, 71, 52], e, 0.014);
+      push([81, 69], e, 0.014);
+      push([79, 67], e, 0.014);
+      push([81, 69], e, 0.014);
+
+      push([83, 71, 47], e, 0.014);
+      push([81, 69], e, 0.014);
+      push([79, 67], e, 0.014);
+      push([78, 66], e, 0.014);
+      push([76, 64, 52], q * 1.5, 0.025);
+
+      return ev;
+    }
+
+    function buildImperialMarchScore() {
+      const q = 60 / 104;
+      const d8 = q * 0.75;
+      const s = q * 0.25;
+      const e = q * 0.5;
+      const h = q * 2.0;
+      const ev = [];
+      let t = 0;
+
+      function push(notes, dur, gap = 0.024) {
+        ev.push({
+          start: Number(t.toFixed(4)),
+          dur: Number(Math.max(0.05, dur - gap).toFixed(4)),
+          notes
+        });
+        t += dur;
+      }
+
+      push([67, 58, 43], q);
+      push([67, 58, 43], q);
+      push([67, 58, 43], q);
+      push([63, 55, 39], d8, 0.015);
+      push([70, 58], s, 0.01);
+
+      push([67, 58, 43], q);
+      push([63, 55, 39], d8, 0.015);
+      push([70, 58], s, 0.01);
+      push([67, 58, 43], h, 0.04);
+
+      push([74, 67, 50], q);
+      push([74, 67, 50], q);
+      push([74, 67, 50], q);
+      push([75, 67, 51], d8, 0.015);
+      push([70, 58], s, 0.01);
+
+      push([66, 57, 42], q);
+      push([63, 55, 39], d8, 0.015);
+      push([70, 58], s, 0.01);
+      push([67, 58, 43], h, 0.04);
+
+      push([79, 67, 43], q);
+      push([67, 55], d8, 0.015);
+      push([67, 55], s, 0.01);
+      push([79, 67, 43], q);
+      push([78, 66], d8, 0.015);
+      push([77, 65], s, 0.01);
+
+      push([76, 64], s, 0.008);
+      push([75, 63], s, 0.008);
+      push([76, 64], e, 0.02);
+      t += e;
+      push([68, 56], e, 0.015);
+      push([73, 61, 49], q);
+      push([72, 60], d8, 0.015);
+      push([71, 59], s, 0.01);
+
+      push([70, 58], s, 0.008);
+      push([69, 57], s, 0.008);
+      push([70, 58], e, 0.02);
+      t += e;
+      push([63, 51], e, 0.015);
+      push([66, 54, 42], q);
+      push([63, 51], d8, 0.015);
+      push([66, 54], s, 0.01);
+
+      push([70, 58, 46], q);
+      push([67, 55], d8, 0.015);
+      push([70, 58], s, 0.01);
+      push([74, 67, 43], h, 0.04);
+
+      return ev;
+    }
+
+    function buildRickrollScore() {
+      const q = 60 / 113;
+      const e = q / 2;
+      const s = q / 4;
+      const d8 = q * 0.75;
+      const h = q * 2.0;
+      const ev = [];
+      let t = 0;
+
+      function push(notes, dur, gap = 0.018) {
+        ev.push({
+          start: Number(t.toFixed(4)),
+          dur: Number(Math.max(0.045, dur - gap).toFixed(4)),
+          notes
+        });
+        t += dur;
+      }
+
+      push([65], s, 0.008);
+      push([67], s, 0.008);
+      push([70], s, 0.008);
+      push([67], s, 0.008);
+      push([74, 65, 46], d8);
+      push([74, 65, 46], d8);
+      push([72, 64, 48], q + e, 0.03);
+
+      push([65], s, 0.008);
+      push([67], s, 0.008);
+      push([70], s, 0.008);
+      push([67], s, 0.008);
+      push([72, 64, 48], d8);
+      push([72, 64, 48], d8);
+      push([70, 62, 45], d8);
+      push([69, 60], s, 0.008);
+      push([67, 58, 50], e + s, 0.02);
+
+      push([65], s, 0.008);
+      push([67], s, 0.008);
+      push([70], s, 0.008);
+      push([67], s, 0.008);
+      push([70, 62, 46], q);
+      push([72, 64], e);
+      push([69, 60, 48], d8);
+      push([67, 58], s, 0.008);
+      push([65, 57, 45], q);
+      push([65, 57], e);
+      push([72, 64, 50], q);
+      push([70, 62, 50], h, 0.03);
+
+      push([65], s, 0.008);
+      push([67], s, 0.008);
+      push([70], s, 0.008);
+      push([67], s, 0.008);
+      push([74, 65, 46], d8);
+      push([74, 65, 46], d8);
+      push([72, 64, 48], q + e, 0.03);
+
+      push([65], s, 0.008);
+      push([67], s, 0.008);
+      push([70], s, 0.008);
+      push([67], s, 0.008);
+      push([77, 69, 48], q);
+      push([69, 60], e);
+      push([70, 62, 50], d8);
+      push([69, 60], s, 0.008);
+      push([67, 58], e, 0.02);
+
+      push([65], s, 0.008);
+      push([67], s, 0.008);
+      push([70], s, 0.008);
+      push([67], s, 0.008);
+      push([70, 62, 46], q);
+      push([72, 64], e);
+      push([69, 60, 48], d8);
+      push([67, 58], s, 0.008);
+      push([65, 57, 45], q);
+      push([65, 57], e);
+      push([72, 64, 48], q);
+      push([65, 57, 41], h, 0.03);
+
+      return ev;
+    }
+
+    const PRESET_SONGS = {
+      runaway: { title: 'Running Away Chime', events: buildRunawayScore() },
+      turkish_march: { title: 'Turkish Classical March', events: buildTurkishMarchScore() },
+      imperial_march: { title: 'Sci-Fi March', events: buildImperialMarchScore() },
+      rickroll: { title: 'Old Pop', events: buildRickrollScore() },
+      custom: { title: 'Custom', events: [] }
+    };
+
+    // ----------------------------------------------------------------------------
+    // 2. APPLICATION STATE & KINEMATIC CONSTANTS
+    // ----------------------------------------------------------------------------
+    const STACCATO_STEPS = [0, 15, 30, 45, 60];
+
+    const CENTER_X = 135.0;
+    const CENTER_Y = 135.0;
+    const CENTER_Z = 15.0;
+    const MIN_X = 102.0, MAX_X = 168.0;
+    const MIN_Y = 98.0,  MAX_Y = 172.0;
+    const MIN_Z = 12.8,  MAX_Z = 17.2;
+
+    const K_XY = 0.1818;
+    const K_Z  = 0.0072;
+    const MIN_PINGPONG_LEG_SEC = 0.080;
+
+    const state = {
+      activeKey: 'runaway',
+      rawEvents: PRESET_SONGS.runaway.events,
+      waveformBars: [],
+      totalDuration: 0,
+      trimStart: 0,
+      trimEnd: 0,
+      voiceMode: '3track',
+      staccatoMs: 15,
+      accel: 15000,
+      octaveShift: 0,
+      lowVolumeSensitivity: false,
+      continuousGlide: false,
+      customAudioCache: null,
+      outputTab: 'console',
+      compiledMoves: [],
+      consoleGcode: '',
+      macroGcode: '',
+      isPlaying: false,
+      playStartTime: 0,
+      playOffsetSec: 0,
+      rafId: null,
+      audioCtx: null,
+      activeAudioNodes: [],
+      wfDragMode: null
+    };
+
+    // ----------------------------------------------------------------------------
+    // 3. CLIENT-SIDE MIDI & STEREO L+R AUDIO (MP3/WAV) PARSERS
+    // ----------------------------------------------------------------------------
+    function parseMidiFile(arrayBuffer) {
+      const view = new DataView(arrayBuffer);
+      let pos = 0;
+
+      function readStr(len) {
+        let s = '';
+        for (let i = 0; i < len && pos < view.byteLength; i++) {
+          s += String.fromCharCode(view.getUint8(pos++));
+        }
+        return s;
+      }
+      function readU32() { const v = view.getUint32(pos); pos += 4; return v; }
+      function readU16() { const v = view.getUint16(pos); pos += 2; return v; }
+      function readVarLen() {
+        let val = 0;
+        while (pos < view.byteLength) {
+          const b = view.getUint8(pos++);
+          val = (val << 7) | (b & 0x7F);
+          if (!(b & 0x80)) break;
+        }
+        return val;
+      }
+
+      if (readStr(4) !== 'MThd') throw new Error('Invalid MIDI header');
+      const headerLen = readU32();
+      readU16();
+      const numTracks = readU16();
+      const division = readU16();
+      pos = 8 + headerLen;
+
+      const ticksPerBeat = (division & 0x8000) ? 480 : division;
+      const tempoEvents = [{ tick: 0, usPerBeat: 500000 }];
+      const rawNoteEvents = [];
+
+      for (let trk = 0; trk < numTracks && pos < view.byteLength; trk++) {
+        const chunkId = readStr(4);
+        const chunkLen = readU32();
+        const trackEnd = Math.min(view.byteLength, pos + chunkLen);
+        if (chunkId !== 'MTrk') {
+          pos = trackEnd;
+          continue;
+        }
+
+        let tick = 0;
+        let runningStatus = 0;
+        const activeNotes = new Map();
+
+        while (pos < trackEnd) {
+          const delta = readVarLen();
+          tick += delta;
+          if (pos >= trackEnd) break;
+
+          let status = view.getUint8(pos);
+          if (status < 0x80) {
+            status = runningStatus;
+          } else {
+            pos++;
+            if (status < 0xF0) runningStatus = status;
+          }
+
+          const cmd = status & 0xF0;
+          const ch = status & 0x0F;
+
+          if (cmd === 0x90 || cmd === 0x80) {
+            const note = view.getUint8(pos++);
+            const vel = view.getUint8(pos++);
+            if (ch === 9) continue;
+            const key = `${ch}_${note}`;
+            if (cmd === 0x90 && vel > 0) {
+              activeNotes.set(key, tick);
+            } else if (activeNotes.has(key)) {
+              const startTick = activeNotes.get(key);
+              activeNotes.delete(key);
+              if (tick > startTick) {
+                rawNoteEvents.push({ startTick, endTick: tick, note });
+              }
+            }
+          } else if (cmd === 0xA0 || cmd === 0xB0 || cmd === 0xE0) {
+            pos += 2;
+          } else if (cmd === 0xC0 || cmd === 0xD0) {
+            pos += 1;
+          } else if (status === 0xFF) {
+            const metaType = view.getUint8(pos++);
+            const len = readVarLen();
+            if (metaType === 0x51 && len === 3 && pos + 3 <= trackEnd) {
+              const usPerBeat = (view.getUint8(pos) << 16) | (view.getUint8(pos + 1) << 8) | view.getUint8(pos + 2);
+              tempoEvents.push({ tick, usPerBeat });
+            }
+            pos += len;
+          } else if (status === 0xF0 || status === 0xF7) {
+            const len = readVarLen();
+            pos += len;
+          }
+        }
+        pos = trackEnd;
+      }
+
+      tempoEvents.sort((a, b) => a.tick - b.tick);
+
+      function tickToSeconds(targetTick) {
+        let sec = 0;
+        let lastTick = 0;
+        let currentTempo = 500000;
+        for (const te of tempoEvents) {
+          if (te.tick >= targetTick) break;
+          sec += ((te.tick - lastTick) / ticksPerBeat) * (currentTempo / 1e6);
+          lastTick = te.tick;
+          currentTempo = te.usPerBeat;
+        }
+        sec += ((targetTick - lastTick) / ticksPerBeat) * (currentTempo / 1e6);
+        return sec;
+      }
+
+      const timedNotes = rawNoteEvents
+        .map(n => ({
+          start: tickToSeconds(n.startTick),
+          end: tickToSeconds(n.endTick),
+          note: n.note
+        }))
+        .filter(n => n.end - n.start >= 0.03);
+
+      if (timedNotes.length === 0) {
+        return buildRunawayScore();
+      }
+
+      const boundaries = new Set();
+      timedNotes.forEach(n => {
+        boundaries.add(Number(n.start.toFixed(3)));
+        boundaries.add(Number(n.end.toFixed(3)));
+      });
+      const sortedTimes = Array.from(boundaries).sort((a, b) => a - b);
+
+      const slices = [];
+      for (let i = 0; i < sortedTimes.length - 1; i++) {
+        const s = sortedTimes[i];
+        const e = sortedTimes[i + 1];
+        const dur = e - s;
+        if (dur < 0.03) continue;
+        const mid = (s + e) / 2;
+        const active = timedNotes
+          .filter(n => n.start <= mid && n.end >= mid)
+          .map(n => n.note);
+        if (active.length > 0) {
+          const unique = Array.from(new Set(active)).sort((a, b) => b - a);
+          slices.push({ start: s, dur, notes: unique });
+        }
+      }
+      return slices;
+    }
+
+    function extractNotesFromStereoMix(monoData, sampleRate, lowVolumeMode) {
+      const winSec = lowVolumeMode ? 0.052 : 0.065;
+      const rmsThreshold = lowVolumeMode ? 0.008 : 0.025;
+      const corrThreshold = lowVolumeMode ? 0.46 : 0.55;
+      const minSegDur = lowVolumeMode ? 0.04 : 0.05;
+
+      const winSamples = Math.floor(sampleRate * winSec);
+      const events = [];
+      const minLag = Math.floor(sampleRate / 1400);
+      const maxLag = Math.floor(sampleRate / 110);
+
+      let prevMidi = null;
+      let segStart = 0;
+      let segDur = 0;
+
+      for (let offset = 0; offset + winSamples < monoData.length; offset += winSamples) {
+        let rms = 0;
+        for (let i = 0; i < winSamples; i++) {
+          rms += monoData[offset + i] * monoData[offset + i];
+        }
+        rms = Math.sqrt(rms / winSamples);
+
+        let detectedMidi = null;
+        if (rms > rmsThreshold) {
+          let bestLag = -1;
+          let bestCorr = 0;
+          for (let lag = minLag; lag <= maxLag; lag++) {
+            let corr = 0;
+            let norm1 = 0;
+            let norm2 = 0;
+            for (let i = 0; i < winSamples - lag; i += 2) {
+              const a = monoData[offset + i];
+              const b = monoData[offset + i + lag];
+              corr += a * b;
+              norm1 += a * a;
+              norm2 += b * b;
+            }
+            const denom = Math.sqrt(norm1 * norm2) || 1;
+            const r = corr / denom;
+            if (r > bestCorr) {
+              bestCorr = r;
+              bestLag = lag;
+            }
+          }
+          if (bestCorr > corrThreshold && bestLag > 0) {
+            const freq = sampleRate / bestLag;
+            detectedMidi = Math.round(69 + 12 * Math.log2(freq / 440));
+          }
+        }
+
+        const curTime = offset / sampleRate;
+        if (detectedMidi !== null && detectedMidi === prevMidi) {
+          segDur += winSec;
+        } else {
+          if (prevMidi !== null && segDur >= minSegDur) {
+            events.push({
+              start: Number(segStart.toFixed(3)),
+              dur: Number(segDur.toFixed(3)),
+              notes: [prevMidi, prevMidi - 12]
+            });
+          }
+          prevMidi = detectedMidi;
+          segStart = curTime;
+          segDur = winSec;
+        }
+      }
+
+      if (prevMidi !== null && segDur >= minSegDur) {
+        events.push({
+          start: Number(segStart.toFixed(3)),
+          dur: Number(segDur.toFixed(3)),
+          notes: [prevMidi, prevMidi - 12]
+        });
+      }
+
+      return events.length ? events : buildRunawayScore();
+    }
+
+    async function parseAudioFile(arrayBuffer) {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      const ctx = new AudioCtx();
+      const audioBuffer = await ctx.decodeAudioData(arrayBuffer);
+
+      // Combine Left + Right stereo channels into a balanced mono sum
+      const numChannels = audioBuffer.numberOfChannels;
+      const len = audioBuffer.length;
+      const monoData = new Float32Array(len);
+
+      if (numChannels >= 2) {
+        const left = audioBuffer.getChannelData(0);
+        const right = audioBuffer.getChannelData(1);
+        for (let i = 0; i < len; i++) {
+          monoData[i] = 0.5 * (left[i] + right[i]);
+        }
+      } else {
+        monoData.set(audioBuffer.getChannelData(0));
+      }
+
+      const sampleRate = audioBuffer.sampleRate;
+
+      // Build 96-bar waveform directly from the L+R summed signal
+      const numBars = 96;
+      const blockSize = Math.max(1, Math.floor(monoData.length / numBars));
+      const bars = [];
+      for (let i = 0; i < numBars; i++) {
+        let sum = 0;
+        const offset = i * blockSize;
+        for (let j = 0; j < blockSize && offset + j < monoData.length; j++) {
+          sum += Math.abs(monoData[offset + j]);
+        }
+        bars.push(Math.min(1, (sum / blockSize) * 3.2));
+      }
+
+      const events = extractNotesFromStereoMix(monoData, sampleRate, state.lowVolumeSensitivity);
+
+      await ctx.close();
+      return { events, bars, monoData, sampleRate };
+    }
+
+    function computeWaveformFromEvents(events, totalDur) {
+      const numBars = 96;
+      const bars = new Array(numBars).fill(0.14);
+      if (totalDur <= 0 || events.length === 0) return bars;
+      for (let i = 0; i < numBars; i++) {
+        const t = ((i + 0.5) / numBars) * totalDur;
+        const active = events.filter(ev => t >= ev.start && t <= ev.start + ev.dur);
+        if (active.length > 0) {
+          const polyBoost = Math.min(1, 0.45 + active[0].notes.length * 0.2);
+          bars[i] = polyBoost;
+        }
+      }
+      return bars;
+    }
+
+    // ----------------------------------------------------------------------------
+    // 4. COREXY + Z-BED ZERO-DRIFT KINEMATICS & G-CODE COMPILER
+    // ----------------------------------------------------------------------------
+    function midiToFreq(midi, octaveShift) {
+      let shifted = midi + octaveShift * 12;
+      while (shifted < 41) shifted += 12;
+      while (shifted > 93) shifted -= 12;
+      return 440 * Math.pow(2, (shifted - 69) / 12);
+    }
+
+    function compileTrackToGcode() {
+      const gapSec = state.staccatoMs / 1000;
+      const clipped = state.rawEvents
+        .filter(ev => (ev.start + ev.dur) > state.trimStart && ev.start < state.trimEnd)
+        .map(ev => {
+          const s = Math.max(ev.start, state.trimStart) - state.trimStart;
+          const e = Math.min(ev.start + ev.dur, state.trimEnd) - state.trimStart;
+          return { start: s, dur: e - s, notes: ev.notes };
+        })
+        .filter(ev => ev.dur >= 0.032);
+
+      const moves = [];
+      let curX = CENTER_X;
+      let curY = CENTER_Y;
+      let curZ = CENTER_Z;
+      let dirA = 1;
+      let dirB = 1;
+      let dirZ = 1;
+      let timelineCursor = 0;
+
+      for (const ev of clipped) {
+        const silenceGap = ev.start - timelineCursor;
+        if (silenceGap > 0.015) {
+          moves.push({
+            type: 'dwell',
+            start: timelineCursor,
+            dur: silenceGap,
+            x: curX, y: curY, z: curZ,
+            fA: 0, fB: 0, fZ: 0
+          });
+          timelineCursor += silenceGap;
+        }
+
+        const effectiveGap = ev.dur > (gapSec + 0.035) ? gapSec : 0;
+        const playDur = Math.max(0.032, ev.dur - effectiveGap);
+
+        const sorted = [...ev.notes].sort((a, b) => b - a);
+        let leadMidi = sorted[0];
+        let harmMidi = null;
+        let bassMidi = null;
+
+        if (sorted.length >= 3) {
+          leadMidi = sorted[0];
+          harmMidi = sorted[1];
+          bassMidi = sorted[sorted.length - 1];
+        } else if (sorted.length === 2) {
+          if (sorted[1] < 60) {
+            leadMidi = sorted[0];
+            bassMidi = sorted[1];
+          } else {
+            leadMidi = sorted[0];
+            harmMidi = sorted[1];
+          }
+        } else if (sorted.length === 1 && sorted[0] < 58) {
+          bassMidi = sorted[0];
+          leadMidi = sorted[0] + 12;
+        }
+
+        const f1 = midiToFreq(leadMidi, state.octaveShift);
+        const f2 = harmMidi !== null ? midiToFreq(harmMidi, state.octaveShift) : 0;
+        const f3 = bassMidi !== null ? midiToFreq(bassMidi, state.octaveShift) : 0;
+
+        let fA = f1;
+        let fB = 0;
+        let fZ = 0;
+
+        if (state.voiceMode === 'loudY') {
+          fA = f1;
+          fB = f1;
+          fZ = 0;
+        } else if (state.voiceMode === '2track') {
+          fA = f1;
+          fB = f2 > 0 ? f2 : f1;
+          fZ = 0;
+        } else {
+          fA = f1;
+          fB = f2 > 0 ? f2 : f1;
+          fZ = f3 > 0 ? f3 : 0;
+        }
+
+        let numLegs = 1;
+        if (state.continuousGlide) {
+          const totalDA = K_XY * fA * playDur;
+          const totalDB = K_XY * fB * playDur;
+          const totalDZ = K_Z * fZ * playDur;
+          const maxSpanXY = (totalDA + totalDB) / 2;
+          numLegs = Math.max(1, Math.ceil(Math.max(maxSpanXY / 24.0, totalDZ / 1.5)));
+        } else {
+          numLegs = Math.max(1, Math.round(playDur / MIN_PINGPONG_LEG_SEC));
+        }
+        const legDur = playDur / numLegs;
+
+        for (let leg = 0; leg < numLegs; leg++) {
+          const vA = K_XY * fA;
+          const vB = K_XY * fB;
+          const vZ = K_Z * fZ;
+
+          const dA = vA * legDur;
+          const dB = vB * legDur;
+          const dZ = vZ * legDur;
+
+          let sA = dirA * dA;
+          let sB = dirB * dB;
+          let dx = (sA + sB) / 2;
+          let dy = (sA - sB) / 2;
+          let dz = dirZ * dZ;
+
+          if (state.continuousGlide) {
+            if (curX + dx > MAX_X || curX + dx < MIN_X || curY + dy > MAX_Y || curY + dy < MIN_Y) {
+              const candidates = [
+                [dirA, -dirB],
+                [-dirA, dirB],
+                [-dirA, -dirB]
+              ];
+              for (const [cA, cB] of candidates) {
+                const testSA = cA * dA;
+                const testSB = cB * dB;
+                const testDX = (testSA + testSB) / 2;
+                const testDY = (testSA - testSB) / 2;
+                if (
+                  curX + testDX <= MAX_X && curX + testDX >= MIN_X &&
+                  curY + testDY <= MAX_Y && curY + testDY >= MIN_Y
+                ) {
+                  dirA = cA;
+                  dirB = cB;
+                  sA = testSA;
+                  sB = testSB;
+                  dx = testDX;
+                  dy = testDY;
+                  break;
+                }
+              }
+            }
+          } else {
+            if (curX + dx > MAX_X || curX + dx < MIN_X) {
+              dirA = -dirA;
+              dirB = -dirB;
+              sA = dirA * dA;
+              sB = dirB * dB;
+              dx = (sA + sB) / 2;
+              dy = (sA - sB) / 2;
+            }
+            if (curY + dy > MAX_Y || curY + dy < MIN_Y) {
+              const temp = sA;
+              sA = -sB;
+              sB = -temp;
+              dx = (sA + sB) / 2;
+              dy = (sA - sB) / 2;
+            }
+          }
+
+          if (curZ + dz > MAX_Z || curZ + dz < MIN_Z) {
+            dirZ = -dirZ;
+            dz = dirZ * dZ;
+          }
+
+          const qdx = Number(dx.toFixed(3));
+          const qdy = Number(dy.toFixed(3));
+          const qdz = Number(dz.toFixed(3));
+
+          const dist3D = Math.sqrt(qdx * qdx + qdy * qdy + qdz * qdz);
+          const feedrate = dist3D > 0 ? Math.min(24000, Math.max(60, (dist3D / legDur) * 60)) : 3000;
+
+          curX = Number((curX + qdx).toFixed(3));
+          curY = Number((curY + qdy).toFixed(3));
+          curZ = Number((curZ + qdz).toFixed(3));
+
+          moves.push({
+            type: 'move',
+            start: timelineCursor,
+            dur: legDur,
+            dx: qdx, dy: qdy, dz: qdz,
+            x: curX, y: curY, z: curZ,
+            f: Math.round(feedrate),
+            fA, fB, fZ
+          });
+
+          timelineCursor += legDur;
+
+          if (!state.continuousGlide) {
+            dirA = -dirA;
+            dirB = -dirB;
+            dirZ = -dirZ;
+          }
+        }
+
+        if (effectiveGap > 0.004) {
+          moves.push({
+            type: 'dwell',
+            start: timelineCursor,
+            dur: effectiveGap,
+            x: curX, y: curY, z: curZ,
+            fA: 0, fB: 0, fZ: 0
+          });
+          timelineCursor += effectiveGap;
+        }
+      }
+
+      state.compiledMoves = moves;
+
+      const songTitle = PRESET_SONGS[state.activeKey]?.title || 'Custom Track';
+      const motionLabel = state.continuousGlide ? 'Continuous Glide' : 'Ping-Pong';
+      const bodyLines = [
+        `; orhan.prints — Snapmaker U1 Stepper Synth`,
+        `; Track: ${songTitle} | Mode: ${state.voiceMode} | Motion: ${motionLabel} | M204 S${state.accel}`,
+        `G90`,
+        `G1 X${CENTER_X.toFixed(1)} Y${CENTER_Y.toFixed(1)} Z${CENTER_Z.toFixed(1)} F6000`,
+        `M400`,
+        `M204 S${state.accel}`,
+        `G91`
+      ];
+
+      for (const m of moves) {
+        if (m.type === 'dwell') {
+          const ms = Math.max(1, Math.round(m.dur * 1000));
+          bodyLines.push(`G4 P${ms}`);
+        } else {
+          const parts = ['G1'];
+          if (m.dx !== 0) parts.push(`X${m.dx.toFixed(3)}`);
+          if (m.dy !== 0) parts.push(`Y${m.dy.toFixed(3)}`);
+          if (m.dz !== 0) parts.push(`Z${m.dz.toFixed(3)}`);
+          parts.push(`F${m.f}`);
+          bodyLines.push(parts.join(' '));
+        }
+      }
+
+      bodyLines.push(`M400`);
+      bodyLines.push(`M204 S6000`);
+      bodyLines.push(`G90`);
+      bodyLines.push(`G1 X${CENTER_X.toFixed(1)} Y${CENTER_Y.toFixed(1)} Z${CENTER_Z.toFixed(1)} F6000`);
+
+      state.consoleGcode = bodyLines.join('\n');
+
+      const indentedBody = bodyLines.map(l => `  ${l}`).join('\n');
+      state.macroGcode = [
+        `[gcode_macro START_CHIME]`,
+        `description: orhan.prints Snapmaker U1 stepper chime (${songTitle})`,
+        `gcode:`,
+        indentedBody
+      ].join('\n');
+
+      renderGcodeOutput();
+      drawWaveform();
+      drawBedPreview(state.playOffsetSec);
+    }
+
+    function renderGcodeOutput() {
+      const box = document.getElementById('gcodeOutput');
+      box.value = state.outputTab === 'console' ? state.consoleGcode : state.macroGcode;
+    }
+
+    // ----------------------------------------------------------------------------
+    // 5. RESONANT STEPPER WEBAUDIO SYNTH & 2D KINEMATIC SIMULATION
+    // ----------------------------------------------------------------------------
+    function stopPlayback() {
+      state.isPlaying = false;
+      if (state.rafId) {
+        cancelAnimationFrame(state.rafId);
+        state.rafId = null;
+      }
+      for (const node of state.activeAudioNodes) {
+        try {
+          if (typeof node.stop === 'function') node.stop();
+        } catch (e) {}
+        try {
+          node.disconnect();
+        } catch (e) {}
+      }
+      state.activeAudioNodes = [];
+
+      document.getElementById('playIcon').classList.remove('hidden');
+      document.getElementById('stopIcon').classList.add('hidden');
+      document.getElementById('previewBtnText').textContent = 'Play';
+    }
+
+    async function startPlayback() {
+      if (state.compiledMoves.length === 0) return;
+      stopPlayback();
+
+      const clipDuration = Math.max(0.1, state.trimEnd - state.trimStart);
+      if (state.playOffsetSec >= clipDuration - 0.05) {
+        state.playOffsetSec = 0;
+      }
+
+      state.isPlaying = true;
+      document.getElementById('playIcon').classList.add('hidden');
+      document.getElementById('stopIcon').classList.remove('hidden');
+      document.getElementById('previewBtnText').textContent = 'Stop';
+
+      try {
+        const AudioCtx = window.AudioContext || window.webkitAudioContext;
+        if (!state.audioCtx || state.audioCtx.state === 'closed') {
+          state.audioCtx = new AudioCtx();
+        }
+        const ctx = state.audioCtx;
+        if (ctx.state !== 'running') {
+          await ctx.resume();
+        }
+        if (!state.isPlaying) return;
+
+        const lookahead = 0.03;
+        const now = ctx.currentTime + lookahead;
+        const offset = state.playOffsetSec;
+
+        const bodyFilter = ctx.createBiquadFilter();
+        bodyFilter.type = 'lowpass';
+        bodyFilter.frequency.setValueAtTime(2200, now);
+        bodyFilter.Q.setValueAtTime(1.4, now);
+
+        const compressor = ctx.createDynamicsCompressor();
+        compressor.threshold.setValueAtTime(-16, now);
+        compressor.knee.setValueAtTime(12, now);
+        compressor.ratio.setValueAtTime(4, now);
+        compressor.attack.setValueAtTime(0.005, now);
+        compressor.release.setValueAtTime(0.12, now);
+
+        bodyFilter.connect(compressor);
+        compressor.connect(ctx.destination);
+        state.activeAudioNodes.push(bodyFilter, compressor);
+
+        const mergedAudioSegments = [];
+        for (const m of state.compiledMoves) {
+          if (m.type !== 'move') continue;
+          const prev = mergedAudioSegments[mergedAudioSegments.length - 1];
+          if (
+            prev &&
+            Math.abs((prev.start + prev.dur) - m.start) < 0.005 &&
+            Math.abs(prev.fA - m.fA) < 0.5 &&
+            Math.abs(prev.fB - m.fB) < 0.5 &&
+            Math.abs(prev.fZ - m.fZ) < 0.5
+          ) {
+            prev.dur += m.dur;
+          } else {
+            mergedAudioSegments.push({
+              start: m.start,
+              dur: m.dur,
+              fA: m.fA,
+              fB: m.fB,
+              fZ: m.fZ
+            });
+          }
+        }
+
+        for (const seg of mergedAudioSegments) {
+          if (seg.start + seg.dur <= offset) continue;
+
+          const relStart = Math.max(0, seg.start - offset);
+          const relDur = Math.min(seg.dur, (seg.start + seg.dur) - offset);
+          if (relDur <= 0.008) continue;
+
+          const voices = [];
+          if (seg.fA > 0) voices.push({ f: seg.fA, gain: 0.24, type: 'sawtooth' });
+          if (seg.fB > 0 && Math.abs(seg.fB - seg.fA) > 1) voices.push({ f: seg.fB, gain: 0.17, type: 'triangle' });
+          if (seg.fZ > 0) voices.push({ f: seg.fZ, gain: 0.20, type: 'triangle' });
+
+          for (const v of voices) {
+            const osc = ctx.createOscillator();
+            const gain = ctx.createGain();
+            osc.type = v.type;
+            osc.frequency.setValueAtTime(v.f, now + relStart);
+
+            const attackEnd = now + relStart + Math.min(0.012, relDur * 0.25);
+            const releaseStart = now + relStart + Math.max(0.012, relDur - 0.015);
+
+            gain.gain.setValueAtTime(0.0001, now + relStart);
+            gain.gain.linearRampToValueAtTime(v.gain, attackEnd);
+            gain.gain.setValueAtTime(v.gain, releaseStart);
+            gain.gain.exponentialRampToValueAtTime(0.0001, now + relStart + relDur);
+
+            osc.connect(gain);
+            gain.connect(bodyFilter);
+            osc.start(now + relStart);
+            osc.stop(now + relStart + relDur + 0.015);
+            state.activeAudioNodes.push(osc, gain);
+          }
+        }
+      } catch (err) {
+        // Fallback visual simulation continues even if audio device is locked
+      }
+
+      if (!state.isPlaying) return;
+      state.playStartTime = performance.now() - state.playOffsetSec * 1000;
+
+      function tick(ts) {
+        if (!state.isPlaying) return;
+        const elapsed = (ts - state.playStartTime) / 1000;
+        const total = Math.max(0.1, state.trimEnd - state.trimStart);
+
+        if (elapsed >= total) {
+          state.playOffsetSec = 0;
+          stopPlayback();
+          drawBedPreview(0);
+          return;
+        }
+
+        state.playOffsetSec = elapsed;
+        drawBedPreview(elapsed);
+        state.rafId = requestAnimationFrame(tick);
+      }
+
+      state.rafId = requestAnimationFrame(tick);
+    }
+
+    // ----------------------------------------------------------------------------
+    // 6. CANVAS RENDERERS (WAVEFORM TRIMMER & LIGHT/DARK 2D U1 SIMULATOR)
+    // ----------------------------------------------------------------------------
+    function drawWaveform() {
+      const canvas = document.getElementById('waveformCanvas');
+      if (!canvas) return;
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width === 0 || rect.height === 0) return;
+
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      const isDark = document.documentElement.classList.contains('dark');
+      const w = rect.width;
+      const h = rect.height;
+
+      ctx.clearRect(0, 0, w, h);
+
+      const bars = state.waveformBars;
+      if (!bars.length) return;
+
+      const total = Math.max(0.1, state.totalDuration);
+      const startFrac = state.trimStart / total;
+      const endFrac = state.trimEnd / total;
+
+      const x1 = startFrac * w;
+      const x2 = endFrac * w;
+      const accent = isDark ? '#0A84FF' : '#0071E3';
+
+      ctx.fillStyle = isDark ? 'rgba(10, 132, 255, 0.15)' : 'rgba(0, 113, 227, 0.10)';
+      ctx.fillRect(x1, 0, Math.max(2, x2 - x1), h);
+
+      const step = w / bars.length;
+      const barW = Math.max(2, step * 0.62);
+
+      for (let i = 0; i < bars.length; i++) {
+        const frac = (i + 0.5) / bars.length;
+        const inWindow = frac >= startFrac && frac <= endFrac;
+        const amp = Math.max(0.14, bars[i]);
+        const barH = amp * (h * 0.70);
+        const bx = i * step + (step - barW) / 2;
+        const by = (h - barH) / 2;
+
+        ctx.fillStyle = inWindow ? accent : (isDark ? 'rgba(255,255,255,0.18)' : 'rgba(0,0,0,0.18)');
+        ctx.beginPath();
+        ctx.roundRect(bx, by, barW, barH, 2);
+        ctx.fill();
+      }
+
+      ctx.fillStyle = accent;
+      ctx.fillRect(x1, 0, Math.max(2, x2 - x1), 3);
+      ctx.fillRect(x1, h - 3, Math.max(2, x2 - x1), 3);
+
+      const handleW = 12;
+      const leftHandleX = Math.max(0, Math.min(w - handleW * 2, x1));
+      const rightHandleX = Math.max(handleW, Math.min(w - handleW, x2 - handleW));
+
+      ctx.fillStyle = accent;
+      ctx.beginPath();
+      ctx.roundRect(leftHandleX, 0, handleW, h, [6, 0, 0, 6]);
+      ctx.fill();
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(leftHandleX + 5, h * 0.32, 2, h * 0.36);
+
+      ctx.fillStyle = accent;
+      ctx.beginPath();
+      ctx.roundRect(rightHandleX, 0, handleW, h, [0, 6, 6, 0]);
+      ctx.fill();
+      ctx.fillStyle = '#FFFFFF';
+      ctx.fillRect(rightHandleX + 5, h * 0.32, 2, h * 0.36);
+    }
+
+    function drawBedPreview(timeSec) {
+      const canvas = document.getElementById('bedCanvas');
+      if (!canvas) return;
+      const dpr = window.devicePixelRatio || 1;
+      const rect = canvas.getBoundingClientRect();
+      if (rect.width === 0) return;
+
+      canvas.width = rect.width * dpr;
+      canvas.height = rect.height * dpr;
+      const ctx = canvas.getContext('2d');
+      ctx.scale(dpr, dpr);
+
+      const isDark = document.documentElement.classList.contains('dark');
+      const size = rect.width;
+      const pad = 26;
+      const bedPx = size - pad * 2;
+      const mmToPx = bedPx / 270;
+
+      const bgCol = isDark ? '#141518' : '#F4F5F7';
+      const plateCol = isDark ? '#1C1E22' : '#FFFFFF';
+      const gridCol = isDark ? 'rgba(255,255,255,0.06)' : 'rgba(0,0,0,0.06)';
+      const borderCol = isDark ? 'rgba(255,255,255,0.16)' : 'rgba(0,0,0,0.16)';
+      const textCol = isDark ? '#98989D' : '#6E6E73';
+      const gantryCol = isDark ? 'rgba(255,255,255,0.22)' : 'rgba(0,0,0,0.20)';
+      const accentBlue = isDark ? '#0A84FF' : '#0071E3';
+
+      ctx.fillStyle = bgCol;
+      ctx.fillRect(0, 0, size, size);
+
+      ctx.fillStyle = plateCol;
+      ctx.strokeStyle = borderCol;
+      ctx.lineWidth = 1.5;
+      ctx.beginPath();
+      ctx.roundRect(pad, pad, bedPx, bedPx, 8);
+      ctx.fill();
+      ctx.stroke();
+
+      ctx.strokeStyle = gridCol;
+      ctx.lineWidth = 1;
+      for (let mm = 10; mm < 270; mm += 10) {
+        const p = pad + mm * mmToPx;
+        ctx.beginPath();
+        ctx.moveTo(p, pad); ctx.lineTo(p, pad + bedPx);
+        ctx.moveTo(pad, p); ctx.lineTo(pad + bedPx, p);
+        ctx.stroke();
+      }
+
+      const safeX = pad + MIN_X * mmToPx;
+      const safeY = pad + (270 - MAX_Y) * mmToPx;
+      const safeW = (MAX_X - MIN_X) * mmToPx;
+      const safeH = (MAX_Y - MIN_Y) * mmToPx;
+
+      ctx.strokeStyle = 'rgba(16, 185, 129, 0.55)';
+      ctx.setLineDash([4, 3]);
+      ctx.lineWidth = 1.25;
+      ctx.strokeRect(safeX, safeY, safeW, safeH);
+      ctx.setLineDash([]);
+
+      let curX = CENTER_X, curY = CENTER_Y, curZ = CENTER_Z;
+      let fA = 0, fB = 0, fZ = 0;
+      let activeIdx = -1;
+
+      for (let i = 0; i < state.compiledMoves.length; i++) {
+        const m = state.compiledMoves[i];
+        if (timeSec >= m.start && timeSec <= m.start + m.dur) {
+          activeIdx = i;
+          const frac = m.dur > 0 ? (timeSec - m.start) / m.dur : 0;
+          if (m.type === 'move') {
+            curX = (m.x - m.dx) + m.dx * frac;
+            curY = (m.y - m.dy) + m.dy * frac;
+            curZ = (m.z - m.dz) + m.dz * frac;
+            fA = m.fA; fB = m.fB; fZ = m.fZ;
+          } else {
+            curX = m.x; curY = m.y; curZ = m.z;
+          }
+          break;
+        }
+      }
+
+      if (activeIdx > 0) {
+        ctx.strokeStyle = isDark ? 'rgba(10, 132, 255, 0.35)' : 'rgba(0, 113, 227, 0.30)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        const trailStart = Math.max(0, activeIdx - 14);
+        for (let i = trailStart; i <= activeIdx; i++) {
+          const tm = state.compiledMoves[i];
+          const tx = pad + tm.x * mmToPx;
+          const ty = pad + (270 - tm.y) * mmToPx;
+          if (i === trailStart) ctx.moveTo(tx, ty);
+          else ctx.lineTo(tx, ty);
+        }
+        ctx.stroke();
+      }
+
+      const headPxX = pad + curX * mmToPx;
+      const headPxY = pad + (270 - curY) * mmToPx;
+
+      if (fZ > 0) {
+        const pulse = (Math.sin(timeSec * 36) + 1) * 0.5;
+        ctx.strokeStyle = `rgba(16, 185, 129, ${0.25 + pulse * 0.45})`;
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.arc(headPxX, headPxY, 16 + pulse * 14, 0, Math.PI * 2);
+        ctx.stroke();
+      }
+
+      ctx.strokeStyle = gantryCol;
+      ctx.lineWidth = 4;
+      ctx.beginPath();
+      ctx.moveTo(pad, headPxY);
+      ctx.lineTo(pad + bedPx, headPxY);
+      ctx.stroke();
+
+      const pulleys = [
+        { x: pad, y: pad + bedPx, active: fA > 0, color: accentBlue, label: 'A' },
+        { x: pad + bedPx, y: pad + bedPx, active: fB > 0, color: '#F59E0B', label: 'B' }
+      ];
+      for (const p of pulleys) {
+        ctx.fillStyle = p.active ? p.color : (isDark ? '#2C2C2E' : '#D1D1D6');
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, 8, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#FFFFFF';
+        ctx.font = '700 8px "SF Mono", ui-monospace, Menlo, monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(p.label, p.x, p.y + 3);
+      }
+
+      ctx.fillStyle = accentBlue;
+      ctx.beginPath();
+      ctx.arc(headPxX, headPxY, 7, 0, Math.PI * 2);
+      ctx.fill();
+      ctx.strokeStyle = isDark ? '#FFFFFF' : '#1D1D1F';
+      ctx.lineWidth = 1.5;
+      ctx.stroke();
+
+      ctx.fillStyle = textCol;
+      ctx.font = '500 9px "SF Mono", ui-monospace, Menlo, monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('0,0', pad, pad + bedPx + 14);
+      ctx.textAlign = 'right';
+      ctx.fillText('270×270 mm', pad + bedPx, pad + bedPx + 14);
+
+      const totalClip = Math.max(0.1, state.trimEnd - state.trimStart);
+      document.getElementById('telPos').textContent = `X${curX.toFixed(1)} Y${curY.toFixed(1)} Z${curZ.toFixed(1)}`;
+      document.getElementById('telMotorsAB').textContent = `${Math.round(fA)} Hz · ${Math.round(fB)} Hz`;
+      document.getElementById('telMotorZ').textContent = `${Math.round(fZ)} Hz`;
+      document.getElementById('scrubCurrent').textContent = `${timeSec.toFixed(1)}s`;
+      document.getElementById('scrubTotal').textContent = `${totalClip.toFixed(1)}s`;
+      document.getElementById('timelineScrubber').value = Math.min(1000, Math.round((timeSec / totalClip) * 1000));
+    }
+
+    // ----------------------------------------------------------------------------
+    // 7. SONG LOADING, TRIM SYNC & UI EVENT BINDINGS
+    // ----------------------------------------------------------------------------
+    function loadSong(key, events, customBars = null) {
+      stopPlayback();
+      state.activeKey = key;
+      state.rawEvents = events;
+
+      const maxTime = events.reduce((acc, ev) => Math.max(acc, ev.start + ev.dur), 0);
+      state.totalDuration = Number(Math.max(0.5, maxTime).toFixed(1));
+      state.trimStart = 0;
+      state.trimEnd = state.totalDuration;
+      state.playOffsetSec = 0;
+      state.waveformBars = customBars || computeWaveformFromEvents(events, state.totalDuration);
+
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        const isMatch = btn.dataset.preset === key;
+        if (isMatch) {
+          btn.classList.add('border-apple-blue', 'dark:border-darkapple-blue', 'bg-apple-blue', 'dark:bg-darkapple-blue', 'text-white', 'shadow-sm');
+          btn.classList.remove('bg-apple-elevated/70', 'dark:bg-darkapple-elevated/60', 'bg-apple-elevated/40', 'dark:bg-darkapple-elevated/30', 'opacity-75');
+        } else {
+          btn.classList.remove('border-apple-blue', 'dark:border-darkapple-blue', 'bg-apple-blue', 'dark:bg-darkapple-blue', 'text-white', 'shadow-sm');
+          btn.classList.add('bg-apple-elevated/70', 'dark:bg-darkapple-elevated/60');
+        }
+      });
+
+      syncTrimUI();
+      compileTrackToGcode();
+    }
+
+    function syncTrimUI() {
+      const total = state.totalDuration;
+      const startInput = document.getElementById('startSecInput');
+      const endInput = document.getElementById('endSecInput');
+      const startRange = document.getElementById('trimStartRange');
+      const endRange = document.getElementById('trimEndRange');
+
+      startInput.max = total;
+      endInput.max = total;
+      startInput.value = state.trimStart.toFixed(1);
+      endInput.value = state.trimEnd.toFixed(1);
+
+      startRange.min = 0;
+      startRange.max = total;
+      startRange.value = state.trimStart;
+
+      endRange.min = 0;
+      endRange.max = total;
+      endRange.value = state.trimEnd;
+
+      document.getElementById('fullTrackBadge').textContent = `(${total.toFixed(1)}s)`;
+      document.getElementById('trimRangeDisplay').textContent = `${state.trimStart.toFixed(1)}s — ${state.trimEnd.toFixed(1)}s`;
+    }
+
+    document.addEventListener('DOMContentLoaded', () => {
+      // Theme Toggle
+      document.getElementById('themeToggle').addEventListener('click', () => {
+        const html = document.documentElement;
+        const willBeDark = !html.classList.contains('dark');
+        html.classList.toggle('dark', willBeDark);
+        localStorage.setItem('orhan_prints_theme', willBeDark ? 'dark' : 'light');
+        drawWaveform();
+        drawBedPreview(state.playOffsetSec);
+      });
+
+      // Low-Volume Audio Sensitivity Toggle (with live re-analysis if audio file is loaded)
+      const lowVolToggle = document.getElementById('lowVolToggle');
+      const lowVolThumb = document.getElementById('lowVolThumb');
+
+      lowVolToggle.addEventListener('click', () => {
+        state.lowVolumeSensitivity = !state.lowVolumeSensitivity;
+        const active = state.lowVolumeSensitivity;
+
+        lowVolToggle.setAttribute('aria-checked', active ? 'true' : 'false');
+        lowVolToggle.classList.toggle('bg-apple-blue', active);
+        lowVolToggle.classList.toggle('dark:bg-darkapple-blue', active);
+        lowVolToggle.classList.toggle('bg-black/20', !active);
+        lowVolToggle.classList.toggle('dark:bg-white/20', !active);
+
+        lowVolThumb.classList.toggle('translate-x-5', active);
+        lowVolThumb.classList.toggle('translate-x-0', !active);
+
+        if (state.customAudioCache) {
+          const { monoData, sampleRate, bars, title } = state.customAudioCache;
+          const reExtracted = extractNotesFromStereoMix(monoData, sampleRate, active);
+          PRESET_SONGS.custom = { title, events: reExtracted, bars };
+          if (state.activeKey === 'custom') {
+            loadSong('custom', reExtracted, bars);
+          }
+        }
+      });
+
+      // Continuous Frequency Glide (Boundary-Bounce) Toggle
+      const continuousGlideToggle = document.getElementById('continuousGlideToggle');
+      const continuousGlideThumb = document.getElementById('continuousGlideThumb');
+
+      continuousGlideToggle.addEventListener('click', () => {
+        state.continuousGlide = !state.continuousGlide;
+        const active = state.continuousGlide;
+
+        continuousGlideToggle.setAttribute('aria-checked', active ? 'true' : 'false');
+        continuousGlideToggle.classList.toggle('bg-apple-blue', active);
+        continuousGlideToggle.classList.toggle('dark:bg-darkapple-blue', active);
+        continuousGlideToggle.classList.toggle('bg-black/20', !active);
+        continuousGlideToggle.classList.toggle('dark:bg-white/20', !active);
+
+        continuousGlideThumb.classList.toggle('translate-x-5', active);
+        continuousGlideThumb.classList.toggle('translate-x-0', !active);
+
+        stopPlayback();
+        compileTrackToGcode();
+      });
+
+      // Preset Selection
+      document.querySelectorAll('.preset-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          const key = btn.dataset.preset;
+          if (key === 'custom' && PRESET_SONGS.custom.events.length === 0) {
+            document.getElementById('fileInput').click();
+            return;
+          }
+          loadSong(key, PRESET_SONGS[key].events, PRESET_SONGS[key].bars || null);
+        });
+      });
+
+      // File Upload (.MID, .MIDI, .MP3, .WAV) -> Updates Dynamic Custom Card Name
+      async function handleUploadedFile(file) {
+        if (!file) return;
+        const statusEl = document.getElementById('fileStatusText');
+        const customLabelEl = document.getElementById('customPresetLabel');
+        statusEl.textContent = `Analyzing ${file.name}...`;
+
+        try {
+          const buf = await file.arrayBuffer();
+          const ext = file.name.split('.').pop().toLowerCase();
+          const cleanName = file.name.replace(/\.[^/.]+$/, '');
+          let events = [];
+          let bars = null;
+
+          if (ext === 'mid' || ext === 'midi') {
+            state.customAudioCache = null;
+            events = parseMidiFile(buf);
+          } else {
+            const res = await parseAudioFile(buf);
+            events = res.events;
+            bars = res.bars;
+            state.customAudioCache = {
+              monoData: res.monoData,
+              sampleRate: res.sampleRate,
+              bars: res.bars,
+              title: cleanName
+            };
+          }
+
+          PRESET_SONGS.custom = { title: cleanName, events, bars };
+          customLabelEl.textContent = cleanName;
+          statusEl.textContent = `Loaded: ${file.name}`;
+          loadSong('custom', events, bars);
+        } catch (err) {
+          statusEl.textContent = `Could not parse ${file.name} — try another MIDI or audio file.`;
+        }
+      }
+
+      document.getElementById('fileInput').addEventListener('change', e => {
+        handleUploadedFile(e.target.files[0]);
+      });
+
+      const dropZone = document.getElementById('dropZone');
+      dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('border-apple-blue'); });
+      dropZone.addEventListener('dragleave', () => dropZone.classList.remove('border-apple-blue'));
+      dropZone.addEventListener('drop', e => {
+        e.preventDefault();
+        dropZone.classList.remove('border-apple-blue');
+        if (e.dataTransfer.files.length) handleUploadedFile(e.dataTransfer.files[0]);
+      });
+
+      // Voice Mode Selector
+      document.querySelectorAll('.voice-mode-btn').forEach(btn => {
+        btn.addEventListener('click', () => {
+          state.voiceMode = btn.dataset.voicemode;
+          document.querySelectorAll('.voice-mode-btn').forEach(b => {
+            const active = b === btn;
+            b.classList.toggle('bg-apple-card', active);
+            b.classList.toggle('dark:bg-darkapple-elevated', active);
+            b.classList.toggle('shadow-sm', active);
+            b.classList.toggle('font-semibold', active);
+            b.classList.toggle('text-apple-sub', !active);
+            b.classList.toggle('dark:text-darkapple-sub', !active);
+          });
+          stopPlayback();
+          compileTrackToGcode();
+        });
+      });
+
+      // Staccato Articulation Slider (0..4 -> 0, 15, 30, 45, 60 ms)
+      document.getElementById('staccatoRange').addEventListener('input', e => {
+        const idx = Number(e.target.value);
+        state.staccatoMs = STACCATO_STEPS[idx] ?? 15;
+        document.getElementById('staccatoValue').textContent = `${state.staccatoMs} ms`;
+        stopPlayback();
+        compileTrackToGcode();
+      });
+
+      // Acceleration & Octave Shift
+      document.getElementById('accelSelect').addEventListener('change', e => {
+        state.accel = Number(e.target.value);
+        compileTrackToGcode();
+      });
+      document.getElementById('octaveSelect').addEventListener('change', e => {
+        state.octaveShift = Number(e.target.value);
+        stopPlayback();
+        compileTrackToGcode();
+      });
+
+      // Dual-Handle Trim Timeline, Direct Waveform Bracket Dragging & Numerical Inputs
+      const trimStartRange = document.getElementById('trimStartRange');
+      const trimEndRange = document.getElementById('trimEndRange');
+      const startSecInput = document.getElementById('startSecInput');
+      const endSecInput = document.getElementById('endSecInput');
+      const wfCanvas = document.getElementById('waveformCanvas');
+
+      function updateTrim(newStart, newEnd) {
+        const minGap = 0.2;
+        state.trimStart = Math.max(0, Math.min(newStart, state.totalDuration - minGap));
+        state.trimEnd = Math.min(state.totalDuration, Math.max(newEnd, state.trimStart + minGap));
+        state.playOffsetSec = 0;
+        stopPlayback();
+        syncTrimUI();
+        compileTrackToGcode();
+      }
+
+      trimStartRange.addEventListener('input', e => updateTrim(Number(e.target.value), state.trimEnd));
+      trimEndRange.addEventListener('input', e => updateTrim(state.trimStart, Number(e.target.value)));
+      startSecInput.addEventListener('change', e => updateTrim(Number(e.target.value), state.trimEnd));
+      endSecInput.addEventListener('change', e => updateTrim(state.trimStart, Number(e.target.value)));
+
+      let dragStartX = 0;
+      let dragInitialStart = 0;
+      let dragInitialEnd = 0;
+
+      wfCanvas.addEventListener('pointerdown', e => {
+        const rect = wfCanvas.getBoundingClientRect();
+        const px = e.clientX - rect.left;
+        const w = rect.width;
+        const total = Math.max(0.1, state.totalDuration);
+        const x1 = (state.trimStart / total) * w;
+        const x2 = (state.trimEnd / total) * w;
+
+        if (Math.abs(px - x1) <= 22) {
+          state.wfDragMode = 'start';
+        } else if (Math.abs(px - x2) <= 22) {
+          state.wfDragMode = 'end';
+        } else if (px > x1 && px < x2) {
+          state.wfDragMode = 'window';
+          dragStartX = px;
+          dragInitialStart = state.trimStart;
+          dragInitialEnd = state.trimEnd;
+        } else {
+          if (px < x1) {
+            state.wfDragMode = 'start';
+            updateTrim((px / w) * total, state.trimEnd);
+          } else {
+            state.wfDragMode = 'end';
+            updateTrim(state.trimStart, (px / w) * total);
+          }
+        }
+        wfCanvas.setPointerCapture(e.pointerId);
+      });
+
+      wfCanvas.addEventListener('pointermove', e => {
+        if (!state.wfDragMode) return;
+        const rect = wfCanvas.getBoundingClientRect();
+        const px = Math.max(0, Math.min(rect.width, e.clientX - rect.left));
+        const total = Math.max(0.1, state.totalDuration);
+        const tAtCursor = (px / rect.width) * total;
+
+        if (state.wfDragMode === 'start') {
+          updateTrim(tAtCursor, state.trimEnd);
+        } else if (state.wfDragMode === 'end') {
+          updateTrim(state.trimStart, tAtCursor);
+        } else if (state.wfDragMode === 'window') {
+          const deltaSec = ((px - dragStartX) / rect.width) * total;
+          const span = dragInitialEnd - dragInitialStart;
+          let nextStart = dragInitialStart + deltaSec;
+          if (nextStart < 0) nextStart = 0;
+          if (nextStart + span > total) nextStart = total - span;
+          updateTrim(nextStart, nextStart + span);
+        }
+      });
+
+      wfCanvas.addEventListener('pointerup', e => {
+        state.wfDragMode = null;
+        try { wfCanvas.releasePointerCapture(e.pointerId); } catch (err) {}
+      });
+
+      document.getElementById('fullTrackBtn').addEventListener('click', () => {
+        updateTrim(0, state.totalDuration);
+      });
+
+      // 2D Preview Play/Stop & Timeline Scrubber
+      document.getElementById('previewBtn').addEventListener('click', () => {
+        if (state.isPlaying) stopPlayback();
+        else startPlayback();
+      });
+
+      document.getElementById('timelineScrubber').addEventListener('input', e => {
+        stopPlayback();
+        const totalClip = Math.max(0.1, state.trimEnd - state.trimStart);
+        state.playOffsetSec = (Number(e.target.value) / 1000) * totalClip;
+        drawBedPreview(state.playOffsetSec);
+      });
+
+      // G-Code Output Tabs (Fluidd Console vs printer.cfg)
+      const tabConsoleBtn = document.getElementById('tabConsoleBtn');
+      const tabMacroBtn = document.getElementById('tabMacroBtn');
+
+      function setOutputTab(tab) {
+        state.outputTab = tab;
+        const isConsole = tab === 'console';
+        tabConsoleBtn.classList.toggle('bg-apple-card', isConsole);
+        tabConsoleBtn.classList.toggle('dark:bg-darkapple-elevated', isConsole);
+        tabConsoleBtn.classList.toggle('shadow-sm', isConsole);
+        tabConsoleBtn.classList.toggle('font-semibold', isConsole);
+        tabConsoleBtn.classList.toggle('text-apple-sub', !isConsole);
+
+        tabMacroBtn.classList.toggle('bg-apple-card', !isConsole);
+        tabMacroBtn.classList.toggle('dark:bg-darkapple-elevated', !isConsole);
+        tabMacroBtn.classList.toggle('shadow-sm', !isConsole);
+        tabMacroBtn.classList.toggle('font-semibold', !isConsole);
+        tabMacroBtn.classList.toggle('text-apple-sub', isConsole);
+        renderGcodeOutput();
+      }
+
+      tabConsoleBtn.addEventListener('click', () => setOutputTab('console'));
+      tabMacroBtn.addEventListener('click', () => setOutputTab('macro'));
+
+      // Copy & Download G-Code
+      document.getElementById('copyGcodeBtn').addEventListener('click', async () => {
+        const text = document.getElementById('gcodeOutput').value;
+        try {
+          await navigator.clipboard.writeText(text);
+        } catch (err) {
+          const box = document.getElementById('gcodeOutput');
+          box.select();
+          document.execCommand('copy');
+        }
+        document.getElementById('copyIcon').classList.add('hidden');
+        document.getElementById('checkIcon').classList.remove('hidden');
+        document.getElementById('copyBtnLabel').textContent = 'Copied!';
+        setTimeout(() => {
+          document.getElementById('copyIcon').classList.remove('hidden');
+          document.getElementById('checkIcon').classList.add('hidden');
+          document.getElementById('copyBtnLabel').textContent = 'Copy G-Code';
+        }, 1800);
+      });
+
+      document.getElementById('downloadGcodeBtn').addEventListener('click', () => {
+        const text = document.getElementById('gcodeOutput').value;
+        const blob = new Blob([text], { type: 'text/plain' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        const slug = (PRESET_SONGS[state.activeKey]?.title || 'chime').toLowerCase().replace(/[^a-z0-9]+/g, '_');
+        a.href = url;
+        a.download = `orhan_prints_${slug}.gcode`;
+        a.click();
+        URL.revokeObjectURL(url);
+      });
+
+      // Responsive canvas observer
+      if (typeof ResizeObserver !== 'undefined') {
+        const ro = new ResizeObserver(() => {
+          drawWaveform();
+          drawBedPreview(state.playOffsetSec);
+        });
+        ro.observe(document.getElementById('waveformCanvas'));
+        ro.observe(document.getElementById('bedCanvas'));
+      } else {
+        window.addEventListener('resize', () => {
+          drawWaveform();
+          drawBedPreview(state.playOffsetSec);
+        });
+      }
+
+      // Boot with default song ("Running Away Chime")
+      loadSong('runaway', PRESET_SONGS.runaway.events);
+      requestAnimationFrame(() => {
+        drawWaveform();
+        drawBedPreview(0);
+      });
+    });
+  </script>
+</body>
+</html>
